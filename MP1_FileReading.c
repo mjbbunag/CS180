@@ -53,7 +53,8 @@ int intGrid(){
 
 int createGrid(){
 	int i,j;
-	int a,b;
+	int a,b,c;
+	int carLen;
 	for(i=0;i<=gridSize+1;i++){
 		for(j=0;j<=(gridSize*2)+2;j++){		
 			if(i==0 || i==gridSize+1){
@@ -69,16 +70,56 @@ int createGrid(){
 					grid[i][j]='|';
 				}
 				else if(j%2==0 && j!=(gridSize*2)+2){
-					if(grid[i][j]!='<' || grid[i][j]!='^'){
+					if(grid[i][j]!='<' && grid[i][j]!='^' && grid[i][j]!='|' && grid[i][j]!='-' && grid[i][j]!='v' && grid[i][j]!='>'){
+					//if walang car, *
 						grid[i][j]='*';
 					}
 					for(a=0;a<6;a++){
 						if((carCoor[a][1]-'0')+1==i && (carCoor[a][0]-'0')==(j/2)-1){
+						//checheck niya yung carCoor para malaman kung may car ba sa coordinate na yon
 							if(carCoor[a][2]=='h'){
 								grid[i][j]='<';
+								carLen=carCoor[a][3]-'0';
+								if(carLen>=gridSize){
+									printf("ERROR: Car is too long.");
+								}
+								else{
+									b=0;
+									c=j;
+									while(b<=carLen-2){
+										c+=2;
+										if(b==carLen-2){
+											grid[i][c]='>';
+										}
+										else{
+											grid[i][c]='-';
+											//maglalagay ng - as "body" ng car
+										}
+										b++;
+									}
+								}
 							}
 							else if(carCoor[a][2]=='v'){
 								grid[i][j]='^';
+								carLen=carCoor[a][3]-'0';
+								if(carLen>=gridSize){
+									printf("ERROR: Car is too long.");
+								}
+								else{
+									b=0;
+									c=i;
+									while(b<=carLen-2){
+										c++;
+										if(b==carLen-2){
+											grid[c][j]='v';
+										}
+										else{
+											grid[c][j]='|';
+											//maglalagay ng | as "body" ng car
+										}
+										b++;
+									}
+								}
 							}
 						}
 					}
@@ -92,6 +133,7 @@ int createGrid(){
 	drawGrid();
 }
 int drawGrid(){
+	//prints the grid
 	int i,j;
 	for(i=0;i<=gridSize+1;i++){
 		for(j=0;j<=(gridSize*2)+2;j++){
