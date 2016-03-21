@@ -32,14 +32,15 @@ int moveCar(char input[3]){
 	int y 		= (carCoor[carNum][1])-'0';
 	int len 	= (carCoor[carNum][3])-'0';
 	int step	= (input[2])-'0';
+	//debugger
 	printf("Your numbers are ... %c %c %c %c \n\n", carCoor[carNum][0],carCoor[carNum][1],carCoor[carNum][3],input[2]);
 	switch(input[1]){ // three checks: direction check; out of bounds check; clear pathway check.
 		case 'L':
 			if(carCoor[carNum][2]=='v'){return -1;}
 			if(x-step<0){return -1;}
 			for(iterx=x-step;iterx<=x-1;iterx++){
+				//debugger
 				printf("grid[%d][%d] is %c, grid[3][2] is %c\n",y+1,iterx*2+1,grid[y][iterx],grid[3][2]);
-				printf("abot!");
 				if(grid[y+1][iterx*2+1]!='*'){return -1;}
 			}
 			break;
