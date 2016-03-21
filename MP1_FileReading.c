@@ -1,10 +1,12 @@
 #include <stdio.h>
 
 int carCoordinates();
-int drawGird();
+int createGrid();
+int drawGrid();
 
 int gridSize;
 char carCoor[10][10];
+char grid[50][50];
 FILE*fptr;
 
 int main(){
@@ -13,7 +15,8 @@ int main(){
 	}
 	else{
 		intGrid();
-		drawGrid();
+		createGrid();
+		
 	}
 }
 
@@ -48,29 +51,51 @@ int intGrid(){
 
 }
 
-int drawGrid(){
+int createGrid(){
 	int i,j;
+	int a,b;
 	for(i=0;i<=gridSize+1;i++){
 		for(j=0;j<=(gridSize*2)+2;j++){		
 			if(i==0 || i==gridSize+1){
 				if(j==0 || j==(gridSize*2)+2){
-					printf("+");			
+					grid[i][j]='+';			
 				}
 				else{
-					printf("-");
+					grid[i][j]='-';
 				}
 			}
 			else{
 				if(j==0 || j==(gridSize*2)+2 && i!=gridSize/2){
-					printf("|");
+					grid[i][j]='|';
 				}
 				else if(j%2==0 && j!=(gridSize*2)+2){
-					printf("*");
+					if(grid[i][j]!='<' || grid[i][j]!='^'){
+						grid[i][j]='*';
+					}
+					for(a=0;a<6;a++){
+						if((carCoor[a][1]-'0')+1==i && (carCoor[a][0]-'0')==(j/2)-1){
+							if(carCoor[a][2]=='h'){
+								grid[i][j]='<';
+							}
+							else if(carCoor[a][2]=='v'){
+								grid[i][j]='^';
+							}
+						}
+					}
 				}
 				else{
-					printf(" ");
+					grid[i][j]=' ';
 				}
 			}
+		}
+	}
+	drawGrid();
+}
+int drawGrid(){
+	int i,j;
+	for(i=0;i<=gridSize+1;i++){
+		for(j=0;j<=(gridSize*2)+2;j++){
+			printf("%c",grid[i][j]);
 		}
 		printf("\n");
 	}
