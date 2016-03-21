@@ -41,28 +41,28 @@ int moveCar(char input[3]){
 			for(iterx=x-step;iterx<=x-1;iterx++){
 				//debugger
 				printf("grid[%d][%d] is %c, grid[3][2] is %c\n",y+1,iterx*2+1,grid[y][iterx],grid[3][2]);
-				if(grid[y+1][iterx*2+1]!='*'){return -1;}
+				if(grid[y][iterx]!='*'){return -1;}
 			}
 			break;
 		case 'R':
 			if(carCoor[carNum][2]=='v'){return -1;}
 			if(x+len+step>gridSize){return -1;}
 			for(iterx=x+len;iterx<=x+len+step;iterx++){
-				if(grid[y+1][iterx*2+1]!='*'){return -1;}
+				if(grid[y][iterx]!='*'){return -1;}
 			}
 			break;
 		case 'U':
 			if(carCoor[carNum][2]=='h'){return -1;}
 			if(y-step<0){return -1;}
 			for(itery=y-step;itery<=y-1;itery++){
-				if(grid[itery+1][x*2+1]!='*'){return -1;}
+				if(grid[itery][x]!='*'){return -1;}
 			}
 			break;
 		case 'D':
 			if(carCoor[carNum][2]=='h'){return -1;}
 			if(y+len+step>gridSize){return -1;}
 			for(itery=y+len;itery<=y+len+step;itery++){
-				if(grid[itery+1][x*2+1]!='*'){return -1;}
+				if(grid[itery][x]!='*'){return -1;}
 			}
 			break;
 		default:
