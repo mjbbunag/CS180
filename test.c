@@ -3,16 +3,16 @@
 int carCoordinates();
 int createGrid();
 int drawGrid();
-int moveCar();
+int testMove();
 
-int gridSize;
+int gridSize, carCount;
 char carCoor[10][10];
 char grid[50][50];
 char alphabet[10] = "ABCDEFGHIJ";
 FILE*fptr;
 
 int main(){
-	int ix, jx;
+	int ix, jx, kx;
 	if((fptr=fopen("input.txt","r"))==NULL){
 		printf("ERROR: File does not exist");
 	}
@@ -20,27 +20,34 @@ int main(){
 		intGrid();
 		createGrid();
 	}
-	moveCar("AL1");
+	char test[3];
+	char direction[4] = "LDUR";
+	for(ix=0;ix<10;ix++){
+		test[0] = alphabet[ix];
+		for(jx=0;jx<4;jx++){
+			test[1] = direction[jx];
+			for(kx=1;kx<gridSize;kx++){
+				test[2] = kx + '0';
+				testMove(test);
+			}
+		}
+	}
 }
 
-int moveCar(char input[3]){
+int testMove(char input[3]){
 	int carNum = -1;
 	int ix, iterx, itery;
-	for(ix=0; ix<10; ix++){carNum = (alphabet[ix]==input[0])? ix:carNum;} // hanapin yung car
+	for(ix=0; ix<=carCount; ix++){carNum = (alphabet[ix]==input[0])? ix:carNum;} // hanapin yung car
 	if(carNum==-1){return -1;} // exit na kapag wala yung car
 	int x 		= (carCoor[carNum][0])-'0';
 	int y 		= (carCoor[carNum][1])-'0';
 	int len 	= (carCoor[carNum][3])-'0';
 	int step	= (input[2])-'0';
-	//debugger
-	printf("Your numbers are ... %c %c %c %c \n\n", carCoor[carNum][0],carCoor[carNum][1],carCoor[carNum][3],input[2]);
 	switch(input[1]){ // three checks: direction check; out of bounds check; clear pathway check.
 		case 'L':
 			if(carCoor[carNum][2]=='v'){return -1;}
 			if(x-step<0){return -1;}
 			for(iterx=x-step;iterx<=x-1;iterx++){
-				//debugger
-				printf("grid[%d][%d] is %c, grid[3][2] is %c\n",y+1,iterx*2+1,grid[y][iterx],grid[3][2]);
 				if(grid[y][iterx]!='*'){return -1;}
 			}
 			break;
@@ -68,7 +75,8 @@ int moveCar(char input[3]){
 		default:
 			return -1;
 	}
-	printf("%s is an okay input!", input);
+	printf("%s is an okay input!\n", input);
+	return 1;
 }
 
 int intGrid(){
@@ -84,7 +92,7 @@ int intGrid(){
 		}
 		else if (i==-1){
 			gridSize=charac-'0';
-			//char->int of gridsize
+			//char->int of gridSize
 			printf("%d\n",gridSize);
 		}
 		else if(!isspace(charac)){
@@ -93,7 +101,8 @@ int intGrid(){
 			j++;
 		}
 	}
-	for(i=0;i<6;i++){
+	carCount = i;
+	for(i=0;i<carCount;i++){
 		for(j=0;j<4;j++){
 			printf("%c, ",carCoor[i][j]);
 		}
@@ -107,7 +116,7 @@ int createGrid(){
 	int a,b,c;
 	int carLen;
 	for(i=0;i<=gridSize;i++){
-		for(j=0;j<=gridSize;j++){		
+		for(j=0;j<=gridSize;j++){
 				if(j!=gridSize){
 					if(grid[i][j]!='<' && grid[i][j]!='^' && grid[i][j]!='|' && grid[i][j]!='-' && grid[i][j]!='v' && grid[i][j]!='>'){
 					//if walang car, *
