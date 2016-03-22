@@ -103,7 +103,8 @@ int intGrid(){
 			j++;
 		}
 	}
-	carCount = i;
+	carCount = i+1;
+	printf("%d\n",carCount);
 	for(i=0;i<carCount;i++){
 		for(j=0;j<4;j++){
 			printf("%c, ",carCoor[i][j]);
@@ -127,7 +128,7 @@ int createGrid(){
 				if((carCoor[a][1]-'0')==i && (carCoor[a][0]-'0')==j){
 				//checheck niya yung carCoor para malaman kung may car ba sa coordinate na yon
 					if(grid[i][j]=='<' || grid[i][j]=='^' || grid[i][j]=='|' || grid[i][j]=='-' || grid[i][j]=='v' || grid[i][j]=='>'){
-						printf("ERROR: OVERLAPPING CARS");
+						printf("ERROR: OVERLAPPING CARS1");
 						return 0;
 					}
 					if(carCoor[a][2]=='h'){
@@ -141,7 +142,11 @@ int createGrid(){
 							c=j;
 							while(b<=carLen-2){
 								c++;
-								if(b==carLen-2){
+								if(grid[i][c]=='<' || grid[i][c]=='^' || grid[i][c]=='|' || grid[i][c]=='-' || grid[i][c]=='v' || grid[i][c]=='>'){
+									printf("ERROR: OVERLAPPING CARS2");
+									return 0;
+								}
+								else if(b==carLen-2){
 									grid[i][c]='>';
 								}
 								else{
@@ -163,7 +168,11 @@ int createGrid(){
 							c=i;
 							while(b<=carLen-2){
 								c++;
-								if(b==carLen-2){
+								if(grid[c][j]=='<' || grid[c][j]=='^' || grid[c][j]=='|' || grid[c][j]=='-' || grid[c][j]=='v' || grid[c][j]=='>'){
+									printf("ERROR: OVERLAPPING CARS3");
+									return 0;
+								}
+								else if(b==carLen-2){
 									grid[c][j]='v';
 								}
 								else{
@@ -178,8 +187,8 @@ int createGrid(){
 			}
 		}
 	}
-	for(i=0;i<gridSize;i++){
-		for(j=0;j<gridSize;j++){
+	for(i=0;i<carCount;i++){
+		for(j=0;j<6;j++){
 			printf("| %c ",grid[i][j]);
 		}
 		printf("|\n");
