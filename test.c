@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 int carCoordinates();
 int createGrid();
@@ -14,7 +15,7 @@ FILE*fptr;
 int main(){
 	int ix, jx, kx;
 	if((fptr=fopen("input.txt","r"))==NULL){
-		printf("ERROR: File does not exist");
+		printf("ERROR: File does not exist\n"); exit(0);
 	}
 	else{
 		intGrid();
@@ -103,7 +104,7 @@ int intGrid(){
 			j++;
 		}
 	}
-	carCount = i+1;
+	carCount = i;
 	printf("%d\n",carCount);
 	for(i=0;i<carCount;i++){
 		for(j=0;j<4;j++){
@@ -128,14 +129,14 @@ int createGrid(){
 				if((carCoor[a][1]-'0')==i && (carCoor[a][0]-'0')==j){
 				//checheck niya yung carCoor para malaman kung may car ba sa coordinate na yon
 					if(grid[i][j]=='<' || grid[i][j]=='^' || grid[i][j]=='|' || grid[i][j]=='-' || grid[i][j]=='v' || grid[i][j]=='>'){
-						printf("ERROR: OVERLAPPING CARS1");
+						printf("ERROR: OVERLAPPING CARS 1\n"); exit(0);
 						return 0;
 					}
 					if(carCoor[a][2]=='h'){
 						grid[i][j]='<';
 						carLen=carCoor[a][3]-'0';
 						if(carLen>=gridSize){
-							printf("ERROR: Car is too long.");
+							printf("ERROR: Car is too long.\n"); exit(0);
 						}
 						else{
 							b=0;
@@ -143,7 +144,7 @@ int createGrid(){
 							while(b<=carLen-2){
 								c++;
 								if(grid[i][c]=='<' || grid[i][c]=='^' || grid[i][c]=='|' || grid[i][c]=='-' || grid[i][c]=='v' || grid[i][c]=='>'){
-									printf("ERROR: OVERLAPPING CARS2");
+									printf("ERROR: OVERLAPPING CARS 2 \n");  exit(0);
 									return 0;
 								}
 								else if(b==carLen-2){
@@ -161,7 +162,7 @@ int createGrid(){
 						grid[i][j]='^';
 						carLen=carCoor[a][3]-'0';
 						if(carLen>=gridSize){
-							printf("ERROR: Car is too long.");
+							printf("ERROR: Car is too long.\n"); exit(0);
 						}
 						else{
 							b=0;
@@ -169,7 +170,7 @@ int createGrid(){
 							while(b<=carLen-2){
 								c++;
 								if(grid[c][j]=='<' || grid[c][j]=='^' || grid[c][j]=='|' || grid[c][j]=='-' || grid[c][j]=='v' || grid[c][j]=='>'){
-									printf("ERROR: OVERLAPPING CARS3");
+									printf("ERROR: OVERLAPPING CARS 3\n"); exit(0);
 									return 0;
 								}
 								else if(b==carLen-2){
