@@ -20,7 +20,7 @@ int main(){
 		intGrid();
 		createGrid();
 	}
-	char test[3];
+	char test[4];
 	char direction[4] = "LDUR";
 	for(ix=0;ix<10;ix++){
 		test[0] = alphabet[ix];
@@ -34,7 +34,7 @@ int main(){
 	}
 }
 
-int testMove(char input[3]){
+int testMove(char input[4]){
 	int carNum = -1;
 	int ix, iterx, itery;
 	for(ix=0; ix<=carCount; ix++){carNum = (alphabet[ix]==input[0])? ix:carNum;} // hanapin yung car
@@ -75,6 +75,8 @@ int testMove(char input[3]){
 		default:
 			return -1;
 	}
+	printf("\n");
+	input[3]='\0';
 	printf("%s is an okay input!\n", input);
 	return 1;
 }
@@ -101,7 +103,8 @@ int intGrid(){
 			j++;
 		}
 	}
-	carCount = i;
+	carCount = i+1;
+	printf("%d\n",carCount);
 	for(i=0;i<carCount;i++){
 		for(j=0;j<4;j++){
 			printf("%c, ",carCoor[i][j]);
@@ -115,66 +118,68 @@ int createGrid(){
 	int i,j;
 	int a,b,c;
 	int carLen;
-	for(i=0;i<=gridSize;i++){
-		for(j=0;j<=gridSize;j++){
-				if(j!=gridSize){
-					if(grid[i][j]!='<' && grid[i][j]!='^' && grid[i][j]!='|' && grid[i][j]!='-' && grid[i][j]!='v' && grid[i][j]!='>'){
-					//if walang car, *
-						grid[i][j]='*';
+	for(i=0;i<gridSize;i++){
+		for(j=0;j<gridSize;j++){
+			if(grid[i][j]!='<' && grid[i][j]!='^' && grid[i][j]!='|' && grid[i][j]!='-' && grid[i][j]!='v' && grid[i][j]!='>'){
+			//if walang car, *
+				grid[i][j]='*';
+			}
+			for(a=0;a<carCount;a++){
+				if((carCoor[a][1]-'0')==i && (carCoor[a][0]-'0')==j){
+				//checheck niya yung carCoor para malaman kung may car ba sa coordinate na yon
+					if(grid[i][j]=='<' || grid[i][j]=='^' || grid[i][j]=='|' || grid[i][j]=='-' || grid[i][j]=='v' || grid[i][j]=='>'){
+						printf("ERROR: OVERLAPPING CARS");
+						return 0;
 					}
-					for(a=0;a<6;a++){
-						if((carCoor[a][1]-'0')==i && (carCoor[a][0]-'0')==j){
-						//checheck niya yung carCoor para malaman kung may car ba sa coordinate na yon
-							if(carCoor[a][2]=='h'){
-								grid[i][j]='<';
-								carLen=carCoor[a][3]-'0';
-								if(carLen>=gridSize){
-									printf("ERROR: Car is too long.");
+					if(carCoor[a][2]=='h'){
+						grid[i][j]='<';
+						carLen=carCoor[a][3]-'0';
+						if(carLen>=gridSize){
+							printf("ERROR: Car is too long.");
+						}
+						else{
+							b=0;
+							c=j;
+							while(b<=carLen-2){
+								c++;
+								if(b==carLen-2){
+									grid[i][c]='>';
 								}
 								else{
-									b=0;
-									c=j;
-									while(b<=carLen-2){
-										c++;
-										if(b==carLen-2){
-											grid[i][c]='>';
-										}
-										else{
-											grid[i][c]='-';
-											//maglalagay ng - as "body" ng car
-										}
-										b++;
-									}
+									grid[i][c]='-';
+									//maglalagay ng - as "body" ng car
 								}
+								b++;
 							}
-							else if(carCoor[a][2]=='v'){
-								grid[i][j]='^';
-								carLen=carCoor[a][3]-'0';
-								if(carLen>=gridSize){
-									printf("ERROR: Car is too long.");
+						}
+					}
+					else if(carCoor[a][2]=='v'){
+						grid[i][j]='^';
+						carLen=carCoor[a][3]-'0';
+						if(carLen>=gridSize){
+							printf("ERROR: Car is too long.");
+						}
+						else{
+							b=0;
+							c=i;
+							while(b<=carLen-2){
+								c++;
+								if(b==carLen-2){
+									grid[c][j]='v';
 								}
 								else{
-									b=0;
-									c=i;
-									while(b<=carLen-2){
-										c++;
-										if(b==carLen-2){
-											grid[c][j]='v';
-										}
-										else{
-											grid[c][j]='|';
-											//maglalagay ng | as "body" ng car
-										}
-										b++;
-									}
+									grid[c][j]='|';
+									//maglalagay ng | as "body" ng car
 								}
+								b++;
 							}
 						}
 					}
 				}
+			}
 		}
 	}
-	for(i=0;i<6;i++){
+	for(i=0;i<carCount;i++){
 		for(j=0;j<6;j++){
 			printf("| %c ",grid[i][j]);
 		}
