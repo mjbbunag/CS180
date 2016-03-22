@@ -37,7 +37,7 @@ int main(){
 int testMove(char input[4]){
 	int carNum = -1;
 	int ix, iterx, itery;
-	for(ix=0; ix<=carCount; ix++){carNum = (alphabet[ix]==input[0])? ix:carNum;} // hanapin yung car
+	for(ix=0; ix<carCount; ix++){carNum = (alphabet[ix]==input[0])? ix:carNum;} // hanapin yung car
 	if(carNum==-1){return -1;} // exit na kapag wala yung car
 	int x 		= (carCoor[carNum][0])-'0';
 	int y 		= (carCoor[carNum][1])-'0';
@@ -54,7 +54,7 @@ int testMove(char input[4]){
 		case 'R':
 			if(carCoor[carNum][2]=='v'){return -1;}
 			if(x+len+step>gridSize){return -1;}
-			for(iterx=x+len;iterx<=x+len+step;iterx++){
+			for(iterx=x+len;iterx<x+len+step;iterx++){
 				if(grid[y][iterx]!='*'){return -1;}
 			}
 			break;
@@ -68,7 +68,7 @@ int testMove(char input[4]){
 		case 'D':
 			if(carCoor[carNum][2]=='h'){return -1;}
 			if(y+len+step>gridSize){return -1;}
-			for(itery=y+len;itery<=y+len+step;itery++){
+			for(itery=y+len;itery<y+len+step;itery++){
 				if(grid[itery][x]!='*'){return -1;}
 			}
 			break;
@@ -103,8 +103,7 @@ int intGrid(){
 			j++;
 		}
 	}
-	carCount = i+1;
-	printf("%d\n",carCount);
+	carCount = i;
 	for(i=0;i<carCount;i++){
 		for(j=0;j<4;j++){
 			printf("%c, ",carCoor[i][j]);
@@ -179,8 +178,8 @@ int createGrid(){
 			}
 		}
 	}
-	for(i=0;i<carCount;i++){
-		for(j=0;j<6;j++){
+	for(i=0;i<gridSize;i++){
+		for(j=0;j<gridSize;j++){
 			printf("| %c ",grid[i][j]);
 		}
 		printf("|\n");
