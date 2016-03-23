@@ -5,6 +5,7 @@
 int carCoordinates();
 int createGrid();
 int drawGrid();
+int drawState();
 int testMove();
 
 int gridSize, carCount;
@@ -22,6 +23,8 @@ typedef struct item{
 	struct item * next;
 } item;
 
+item *print;
+
 int main(){
 	int ix, jx, kx, lx;
 	item *head = NULL;
@@ -33,6 +36,8 @@ int main(){
 	else{
 		intGrid();
 		createGrid();
+		printf("Original state:\n");
+		drawGrid();
 	}
 	char test[4];
 	char direction[4] = "LDUR";
@@ -42,13 +47,15 @@ int main(){
 			test[1] = direction[jx];
 			for(kx=1;kx<gridSize;kx++){
 				test[2] = kx + '0';
-				if(testMove(test)==1){
+				if(testMove(test,0)==1){
 					curr = head;
 					if(curr==NULL){
 						head = malloc(sizeof(item));
 						strcpy(head->moves[0],test);
 						for(lx=1;lx<100;lx++){head->moves[lx][0] = 'X';}
 						head->g = 1; head->h = 0;
+						testMove(test,1); // note: only use tempgrid after the use of testMove(test,1)
+						for(lx=0;lx<50;lx++){strcpy(head->state[lx],tempgrid[lx]);}
 						head->next = NULL;
 					}
 					else{
@@ -59,6 +66,8 @@ int main(){
 						strcpy(curr->next->moves[0],test);
 						for(lx=1;lx<100;lx++){curr->next->moves[lx][0] = 'X';}
 						curr->next->g = 1; curr->next->h = 0;
+						testMove(test,1); // note: only use tempgrid after the use of testMove(test,1)
+						for(lx=0;lx<50;lx++){strcpy(curr->next->state[lx],tempgrid[lx]);}
 						curr->next->next = NULL;
 					}
 				}
@@ -68,11 +77,12 @@ int main(){
 	curr = head;
 	while(curr!=NULL){
 		printf("%s is an okay input, g = %d\n",curr->moves[0], curr->g);
+		print = curr; drawState();
 		curr = curr->next;
 	}
 }
 
-int testMove(char input[4]){
+int testMove(char input[4], int action){
 	int carNum = -1;
 	int ix, iterx, itery;
 	for(ix=0; ix<carCount; ix++){carNum = (alphabet[ix]==input[0])? ix:carNum;} // hanapin yung car
@@ -88,12 +98,26 @@ int testMove(char input[4]){
 			for(iterx=x-step;iterx<=x-1;iterx++){
 				if(grid[y][iterx]!='*'){return -1;}
 			}
+			if(action!=0){
+				carCoor[carNum][0] = (x - step) + '0';
+				createGrid();
+				for(ix=0;ix<50;ix++){strcpy(tempgrid[ix],grid[ix]);}
+				carCoor[carNum][0] = x + '0';
+				createGrid();
+			}
 			break;
 		case 'R':
 			if(carCoor[carNum][2]=='v'){return -1;}
 			if(x+len+step>gridSize){return -1;}
 			for(iterx=x+len;iterx<x+len+step;iterx++){
 				if(grid[y][iterx]!='*'){return -1;}
+			}
+			if(action!=0){
+				carCoor[carNum][0] = (x + step) + '0';
+				createGrid();
+				for(ix=0;ix<50;ix++){strcpy(tempgrid[ix],grid[ix]);}
+				carCoor[carNum][0] = x + '0';
+				createGrid();
 			}
 			break;
 		case 'U':
@@ -102,6 +126,13 @@ int testMove(char input[4]){
 			for(itery=y-step;itery<=y-1;itery++){
 				if(grid[itery][x]!='*'){return -1;}
 			}
+			if(action!=0){
+				carCoor[carNum][1] = (y - step) + '0';
+				createGrid();
+				for(ix=0;ix<50;ix++){strcpy(tempgrid[ix],grid[ix]);}
+				carCoor[carNum][1] = y + '0';
+				createGrid();
+			}
 			break;
 		case 'D':
 			if(carCoor[carNum][2]=='h'){return -1;}
@@ -109,11 +140,17 @@ int testMove(char input[4]){
 			for(itery=y+len;itery<y+len+step;itery++){
 				if(grid[itery][x]!='*'){return -1;}
 			}
+			if(action!=0){
+				carCoor[carNum][1] = (y + step) + '0';
+				createGrid();
+				for(ix=0;ix<50;ix++){strcpy(tempgrid[ix],grid[ix]);}
+				carCoor[carNum][1] = y + '0';
+				createGrid();
+			}
 			break;
 		default:
 			return -1;
 	}
-	printf("\n");
 	input[3]='\0';
 	return 1;
 }
@@ -132,7 +169,7 @@ int intGrid(){
 		else if (i==-1){
 			gridSize=charac-'0';
 			//char->int of gridSize
-			printf("%d\n",gridSize);
+			// printf("%d\n",gridSize); //tester
 		}
 		else if(!isspace(charac)){
 			//append to grid(list)
@@ -141,12 +178,12 @@ int intGrid(){
 		}
 	}
 	carCount = i;
-	printf("%d\n",carCount);
+	// printf("%d\n",carCount); //tester
 	for(i=0;i<carCount;i++){
 		for(j=0;j<4;j++){
-			printf("%c, ",carCoor[i][j]);
+			// printf("%c, ",carCoor[i][j]); //tester
 		}
-		printf("\n");
+		// printf("\n"); //tester
 	}
 
 }
@@ -155,6 +192,11 @@ int createGrid(){
 	int i,j;
 	int a,b,c;
 	int carLen;
+	for(i=0;i<50;i++){
+		for(j=0;j<50;j++){
+			grid[i][j] = '\0';
+		}
+	} // initialize empty grid
 	for(i=0;i<gridSize;i++){
 		for(j=0;j<gridSize;j++){
 			if(grid[i][j]!='<' && grid[i][j]!='^' && grid[i][j]!='|' && grid[i][j]!='-' && grid[i][j]!='v' && grid[i][j]!='>'){
@@ -224,13 +266,15 @@ int createGrid(){
 			}
 		}
 	}
-	for(i=0;i<carCount;i++){
-		for(j=0;j<6;j++){
+	/*
+	for(i=0;i<gridSize;i++){
+		for(j=0;j<gridSize;j++){
 			printf("| %c ",grid[i][j]);
 		}
 		printf("|\n");
 	}
-	drawGrid();
+	printf("\n");
+	*/
 }
 int drawGrid(){
 	//prints the grid
@@ -251,6 +295,35 @@ int drawGrid(){
 				}
 				else if(j%2==0 && j!=(gridSize*2)+2){
 					printf("%c",grid[i-1][(j/2)-1]);
+				}
+				else{
+					printf("%c",' ');
+				}
+			}
+		}
+		printf("\n");
+	}
+}
+
+int drawState(){
+	//prints the grid
+	int i,j;
+	for(i=0;i<=gridSize+1;i++){
+		for(j=0;j<=(gridSize*2)+2;j++){
+			if(i==0 || i==gridSize+1){
+				if(j==0 || j==(gridSize*2)+2){
+					printf("%c",'+');
+				}
+				else{
+					printf("%c",'-');
+				}
+			}
+			else{
+				if(j==0 || j==(gridSize*2)+2 && i!=gridSize/2){
+					printf("%c",'|');
+				}
+				else if(j%2==0 && j!=(gridSize*2)+2){
+					printf("%c",print->state[i-1][(j/2)-1]);
 				}
 				else{
 					printf("%c",' ');
