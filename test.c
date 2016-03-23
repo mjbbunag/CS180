@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 int carCoordinates();
 int createGrid();
@@ -9,11 +10,23 @@ int testMove();
 int gridSize, carCount;
 char carCoor[10][10];
 char grid[50][50];
+char tempgrid[50][50];
 char alphabet[10] = "ABCDEFGHIJ";
 FILE*fptr;
 
+typedef struct item{
+	char moves[100][4];
+	char state[50][50];
+	int g;
+	int h;
+	struct item * next;
+} item;
+
 int main(){
-	int ix, jx, kx;
+	int ix, jx, kx, lx;
+	item *head = NULL;
+	item *curr;
+	item *min;
 	if((fptr=fopen("input.txt","r"))==NULL){
 		printf("ERROR: File does not exist\n"); exit(0);
 	}
@@ -29,9 +42,33 @@ int main(){
 			test[1] = direction[jx];
 			for(kx=1;kx<gridSize;kx++){
 				test[2] = kx + '0';
-				testMove(test);
+				if(testMove(test)==1){
+					curr = head;
+					if(curr==NULL){
+						head = malloc(sizeof(item));
+						strcpy(head->moves[0],test);
+						for(lx=1;lx<100;lx++){head->moves[lx][0] = 'X';}
+						head->g = 1; head->h = 0;
+						head->next = NULL;
+					}
+					else{
+						while(curr->next!=NULL){
+							curr = curr->next;
+						}
+						curr->next = malloc(sizeof(item));
+						strcpy(curr->next->moves[0],test);
+						for(lx=1;lx<100;lx++){curr->next->moves[lx][0] = 'X';}
+						curr->next->g = 1; curr->next->h = 0;
+						curr->next->next = NULL;
+					}
+				}
 			}
 		}
+	}
+	curr = head;
+	while(curr!=NULL){
+		printf("%s is an okay input, g = %d\n",curr->moves[0], curr->g);
+		curr = curr->next;
 	}
 }
 
@@ -78,7 +115,6 @@ int testMove(char input[4]){
 	}
 	printf("\n");
 	input[3]='\0';
-	printf("%s is an okay input!\n", input);
 	return 1;
 }
 
