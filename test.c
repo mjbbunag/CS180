@@ -8,8 +8,11 @@ int drawGrid();
 int drawState();
 int testMove();
 
-int gridSize, carCount;
+int gridSize, carCount, global_g, global_h;
+char global_moves[100][4];
+char origCarCoor[10][10];
 char carCoor[10][10];
+char origGrid[50][50];
 char grid[50][50];
 char tempgrid[50][50];
 char alphabet[10] = "ABCDEFGHIJ";
@@ -18,6 +21,7 @@ FILE*fptr;
 typedef struct item{
 	char moves[100][4];
 	char state[50][50];
+	char coor[10][10];
 	int g;
 	int h;
 	struct item * next;
@@ -26,7 +30,7 @@ typedef struct item{
 item *print;
 
 int main(){
-	int ix, jx, kx, lx;
+	int ix, jx, kx, lx, minimum;
 	item *head = NULL;
 	item *curr;
 	item *min;
@@ -36,6 +40,8 @@ int main(){
 	else{
 		intGrid();
 		createGrid();
+		for(ix=0;ix<gridSize;ix++){strcpy(origGrid[ix],grid[ix]);}
+		for(ix=0;ix<10;ix++){strcpy(origCarCoor[ix],carCoor[ix]);}
 		printf("Original state:\n");
 		drawGrid();
 	}
@@ -51,17 +57,15 @@ int main(){
 					curr = head;
 					if(curr==NULL){
 						head = malloc(sizeof(item));
-						strcpy(head->moves[0],test);
-						for(lx=1;lx<100;lx++){head->moves[lx][0] = 'X';}
-						head->g = 1; head->h = 0;
+						strcpy(head->moves[0],test); // change 0 to g in loop
+						for(lx=1;lx<100;lx++){head->moves[lx][0] = 'X';} // unnecessary in loop
+						head->g = 1; head->h = 0; // instead of assigning 1 to g, use g++
 						testMove(test,1); // note: only use tempgrid after the use of testMove(test,1)
 						for(lx=0;lx<50;lx++){strcpy(head->state[lx],tempgrid[lx]);}
 						head->next = NULL;
 					}
 					else{
-						while(curr->next!=NULL){
-							curr = curr->next;
-						}
+						while(curr->next!=NULL){curr = curr->next;}
 						curr->next = malloc(sizeof(item));
 						strcpy(curr->next->moves[0],test);
 						for(lx=1;lx<100;lx++){curr->next->moves[lx][0] = 'X';}
@@ -74,11 +78,17 @@ int main(){
 			}
 		}
 	}
-	curr = head;
-	while(curr!=NULL){
-		printf("%s is an okay input, g = %d\n",curr->moves[0], curr->g);
-		print = curr; drawState();
-		curr = curr->next;
+	min = malloc(sizeof(item));
+	if(1){ // change this to while later
+		curr = head; minimum = 99; min = NULL;
+		while(curr!=NULL){
+			for(ix=0;curr->moves[ix][0]!='X';ix++){printf("%s ",curr->moves[ix]);}
+			printf("are the move(s) performed here:\n");
+			if(minimum > curr->g + curr->h){minimum = curr->g + curr->h; min = curr;}
+			print = curr; drawState();
+			curr = curr->next;
+		}
+		printf("%s is the chosen minimum\n", min->moves[0]);
 	}
 }
 
