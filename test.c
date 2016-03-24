@@ -8,13 +8,14 @@ int drawGrid();
 int drawState();
 int testMove();
 
-int gridSize, carCount, global_g, global_h;
+int gridSize, carCount, global_g, global_h, solution;
 char global_moves[100][4];
 char origCarCoor[10][10];
 char carCoor[10][10];
 char origGrid[50][50];
 char grid[50][50];
 char tempgrid[50][50];
+char tempcoor[10][10];
 char alphabet[10] = "ABCDEFGHIJ";
 FILE*fptr;
 
@@ -45,6 +46,7 @@ int main(){
 		printf("Original state:\n");
 		drawGrid();
 	}
+	solution = -1;
 	char test[4];
 	char direction[4] = "LDUR";
 	for(ix=0;ix<10;ix++){
@@ -53,15 +55,17 @@ int main(){
 			test[1] = direction[jx];
 			for(kx=1;kx<gridSize;kx++){
 				test[2] = kx + '0';
-				if(testMove(test,0)==1){
+				if(testMove(test,0)==1 && solution==-1){
 					curr = head;
 					if(curr==NULL){
 						head = malloc(sizeof(item));
-						strcpy(head->moves[0],test); // change 0 to g in loop
-						for(lx=1;lx<100;lx++){head->moves[lx][0] = 'X';} // unnecessary in loop
-						head->g = 1; head->h = 0; // instead of assigning 1 to g, use g++
-						testMove(test,1); // note: only use tempgrid after the use of testMove(test,1)
+						strcpy(head->moves[0],test);
+						for(lx=1;lx<100;lx++){head->moves[lx][0] = 'X';}
+						head->g = 1; head->h = 0;
+						printf("%s is/are the move(s) performed here:\n",test);
+						testMove(test,1);
 						for(lx=0;lx<50;lx++){strcpy(head->state[lx],tempgrid[lx]);}
+						for(lx=0;lx<10;lx++){strcpy(head->coor[lx],tempcoor[lx]);}
 						head->next = NULL;
 					}
 					else{
@@ -70,8 +74,11 @@ int main(){
 						strcpy(curr->next->moves[0],test);
 						for(lx=1;lx<100;lx++){curr->next->moves[lx][0] = 'X';}
 						curr->next->g = 1; curr->next->h = 0;
+						printf("%s is/are the move(s) performed here:\n",test);
 						testMove(test,1); // note: only use tempgrid after the use of testMove(test,1)
+						if(solution==1){printf("Solution found! \n");}
 						for(lx=0;lx<50;lx++){strcpy(curr->next->state[lx],tempgrid[lx]);}
+						for(lx=0;lx<10;lx++){strcpy(curr->next->coor[lx],tempcoor[lx]);}
 						curr->next->next = NULL;
 					}
 				}
@@ -79,9 +86,9 @@ int main(){
 		}
 	}
 	min = malloc(sizeof(item));
-	if(1){ // change this to while later
-		curr = head; minimum = 99; min = NULL;
-		while(curr!=NULL){
+	/*if(1){ // change this to while later
+		curr = head; minimum = 9999; min = NULL;
+		while(curr!=NULL){ //we'll be needing this for non-zero heuristics
 			for(ix=0;curr->moves[ix][0]!='X';ix++){printf("%s ",curr->moves[ix]);}
 			printf("are the move(s) performed here:\n");
 			if(minimum > curr->g + curr->h){minimum = curr->g + curr->h; min = curr;}
@@ -89,6 +96,61 @@ int main(){
 			curr = curr->next;
 		}
 		printf("%s is the chosen minimum\n", min->moves[0]);
+	}
+	*/
+	while(solution==-1){
+		curr = head;
+		head = (head->next)? head->next:NULL;
+
+		// copy "node to expand" attributes to global variables
+		for(ix=0;ix<100;ix++){strcpy(global_moves[ix],curr->moves[ix]);}
+		for(ix=0;ix<50;ix++){strcpy(grid[ix],curr->state[ix]);}
+		for(ix=0;ix<10;ix++){strcpy(carCoor[ix],curr->coor[ix]);}
+		global_g = curr->g; global_h = curr->h;
+
+		// free curr
+		free(curr);
+
+		for(ix=0;ix<10;ix++){
+			test[0] = alphabet[ix];
+			for(jx=0;jx<4;jx++){
+				test[1] = direction[jx];
+				for(kx=1;kx<gridSize;kx++){
+					test[2] = kx + '0';
+					if(testMove(test,0)==1 && solution==-1){
+						curr = head;
+						if(curr==NULL){
+							head = malloc(sizeof(item));
+							for(lx=0;global_moves[lx][0]!='X';lx++){strcpy(head->moves[lx],global_moves[lx]);printf("%s->",global_moves[lx]);}
+							for(lx=lx+1;lx<100;lx++){strcpy(head->moves[lx],"XXX\0");}
+							head->g = global_g+1; head->h = 0;
+							strcpy(head->moves[global_g],test);
+							printf("%s is/are the move(s) performed here:\n",test);
+							testMove(test,1);
+							for(lx=0;lx<50;lx++){strcpy(head->state[lx],tempgrid[lx]);}
+							for(lx=0;lx<10;lx++){strcpy(head->coor[lx],tempcoor[lx]);}
+							head->next = NULL;
+						}
+						else{
+							while(curr->next!=NULL){curr = curr->next;}
+							curr->next = malloc(sizeof(item));
+							for(lx=0;global_moves[lx][0]!='X';lx++){strcpy(curr->next->moves[lx],global_moves[lx]); printf("%s->",global_moves[lx]);}
+							for(lx=lx+1;lx<100;lx++){strcpy(curr->next->moves[lx],"XXX\0");}
+							curr->next->g = global_g+1; curr->next->h = 0;
+							strcpy(curr->next->moves[global_g],test);
+							printf("%s is/are the move(s) performed here:\n",test);
+							testMove(test,1);
+							if(solution==1){printf("Solution found! \n");}
+							for(lx=0;lx<50;lx++){strcpy(curr->next->state[lx],tempgrid[lx]);}
+							for(lx=0;lx<10;lx++){strcpy(curr->next->coor[lx],tempcoor[lx]);}
+							curr->next->next = NULL;
+						}
+					}
+				}
+			}
+		}
+
+
 	}
 }
 
@@ -112,6 +174,8 @@ int testMove(char input[4], int action){
 				carCoor[carNum][0] = (x - step) + '0';
 				createGrid();
 				for(ix=0;ix<50;ix++){strcpy(tempgrid[ix],grid[ix]);}
+				for(ix=0;ix<10;ix++){strcpy(tempcoor[ix],carCoor[ix]);}
+				drawGrid();
 				carCoor[carNum][0] = x + '0';
 				createGrid();
 			}
@@ -126,6 +190,9 @@ int testMove(char input[4], int action){
 				carCoor[carNum][0] = (x + step) + '0';
 				createGrid();
 				for(ix=0;ix<50;ix++){strcpy(tempgrid[ix],grid[ix]);}
+				for(ix=0;ix<10;ix++){strcpy(tempcoor[ix],carCoor[ix]);}
+				drawGrid();
+				solution = (carCoor[0][0]==gridSize-(carCoor[0][3]-'0')+'0')? 1:-1;
 				carCoor[carNum][0] = x + '0';
 				createGrid();
 			}
@@ -140,6 +207,9 @@ int testMove(char input[4], int action){
 				carCoor[carNum][1] = (y - step) + '0';
 				createGrid();
 				for(ix=0;ix<50;ix++){strcpy(tempgrid[ix],grid[ix]);}
+				for(ix=0;ix<10;ix++){strcpy(tempcoor[ix],carCoor[ix]);}
+				drawGrid();
+				// check if solution #code
 				carCoor[carNum][1] = y + '0';
 				createGrid();
 			}
@@ -154,6 +224,9 @@ int testMove(char input[4], int action){
 				carCoor[carNum][1] = (y + step) + '0';
 				createGrid();
 				for(ix=0;ix<50;ix++){strcpy(tempgrid[ix],grid[ix]);}
+				for(ix=0;ix<10;ix++){strcpy(tempcoor[ix],carCoor[ix]);}
+				drawGrid();
+				// check if solution #code
 				carCoor[carNum][1] = y + '0';
 				createGrid();
 			}
