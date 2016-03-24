@@ -118,6 +118,7 @@ int main(){
 				for(kx=1;kx<gridSize;kx++){
 					test[2] = kx + '0';
 					if(testMove(test,0)==1 && solution==-1){
+						if(test[0]==global_moves[global_g-1][0]){continue;}
 						curr = head;
 						if(curr==NULL){
 							head = malloc(sizeof(item));
