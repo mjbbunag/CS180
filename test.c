@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 int carCoordinates();
 int createGrid();
@@ -8,7 +9,7 @@ int drawGrid();
 int drawState();
 int testMove();
 
-int gridSize, carCount, global_g, global_h, solution;
+int gridSize, carCount, global_g, global_h, solution, nodeCounter;
 char global_moves[100][4];
 char origCarCoor[10][10];
 char carCoor[10][10];
@@ -32,6 +33,8 @@ item *print;
 
 int main(){
 	int ix, jx, kx, lx, minimum;
+	/*initialize time variables #code*/
+	nodeCounter = 1;
 	item *head = NULL;
 	item *curr;
 	item *min;
@@ -43,12 +46,13 @@ int main(){
 		createGrid();
 		for(ix=0;ix<gridSize;ix++){strcpy(origGrid[ix],grid[ix]);}
 		for(ix=0;ix<10;ix++){strcpy(origCarCoor[ix],carCoor[ix]);}
-		printf("Original state:\n");
+		printf("Performing BFS...\nOriginal state:\n");
 		drawGrid();
 	}
 	solution = -1;
 	char test[4];
 	char direction[4] = "LDUR";
+	/*start timer #code*/
 	for(ix=0;ix<10;ix++){
 		test[0] = alphabet[ix];
 		for(jx=0;jx<4;jx++){
@@ -76,7 +80,7 @@ int main(){
 						curr->next->g = 1; curr->next->h = 0;
 						printf("%s is/are the move(s) performed here:\n",test);
 						testMove(test,1); // note: only use tempgrid after the use of testMove(test,1)
-						if(solution==1){printf("Solution found! \n");}
+						if(solution==1){printf("Solution found! \n");/*finish timer #code*/}
 						for(lx=0;lx<50;lx++){strcpy(curr->next->state[lx],tempgrid[lx]);}
 						for(lx=0;lx<10;lx++){strcpy(curr->next->coor[lx],tempcoor[lx]);}
 						curr->next->next = NULL;
@@ -110,6 +114,7 @@ int main(){
 
 		// free curr
 		free(curr);
+		nodeCounter++;
 
 		for(ix=0;ix<10;ix++){
 			test[0] = alphabet[ix];
@@ -141,7 +146,7 @@ int main(){
 							strcpy(curr->next->moves[global_g],test);
 							printf("%s is/are the move(s) performed here:\n",test);
 							testMove(test,1);
-							if(solution==1){printf("Solution found! \n");}
+							if(solution==1){printf("Solution found! \n");/*finish timer #code*/}
 							for(lx=0;lx<50;lx++){strcpy(curr->next->state[lx],tempgrid[lx]);}
 							for(lx=0;lx<10;lx++){strcpy(curr->next->coor[lx],tempcoor[lx]);}
 							curr->next->next = NULL;
@@ -153,6 +158,12 @@ int main(){
 
 
 	}
+	printf(" Number of expanded nodes: %d\n", nodeCounter);
+	printf(" Time: ???\n" /*time???? #code*/);
+	// reset counter, time, global variables, pointers.
+
+	nodeCounter = 0;
+	while((head=curr)!=NULL){curr = curr->next; free(head);}
 }
 
 int testMove(char input[4], int action){
