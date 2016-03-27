@@ -68,6 +68,7 @@ int main(){
 						head->g = 1; head->h = 0;
 						printf("%s is/are the move(s) performed here:\n",test);
 						testMove(test,1);
+						if(solution==1){printf("Solution found! \n");/*finish timer #code*/}
 						for(lx=0;lx<50;lx++){strcpy(head->state[lx],tempgrid[lx]);}
 						for(lx=0;lx<10;lx++){strcpy(head->coor[lx],tempcoor[lx]);}
 						head->next = NULL;
@@ -89,8 +90,9 @@ int main(){
 			}
 		}
 	}
+	/*
 	min = malloc(sizeof(item));
-	/*if(1){ // change this to while later
+	if(1){ // change this to while later
 		curr = head; minimum = 9999; min = NULL;
 		while(curr!=NULL){ //we'll be needing this for non-zero heuristics
 			for(ix=0;curr->moves[ix][0]!='X';ix++){printf("%s ",curr->moves[ix]);}
@@ -114,6 +116,7 @@ int main(){
 
 		// free curr
 		free(curr);
+		curr = malloc(sizeof(item));
 		nodeCounter++;
 
 		for(ix=0;ix<10;ix++){
@@ -162,8 +165,141 @@ int main(){
 	printf(" Time: ???\n" /*time???? #code*/);
 	// reset counter, time, global variables, pointers.
 
-	nodeCounter = 0;
+	nodeCounter = 0; solution=-1;
+	// reset timer #code
 	while((head=curr)!=NULL){curr = curr->next; free(head);}
+	for(ix=0;ix<gridSize;ix++){strcpy(grid[ix],origGrid[ix]);}
+	for(ix=0;ix<10;ix++){strcpy(carCoor[ix],origCarCoor[ix]);}
+	printf("\nPerforming blocking heuristic...\nOriginal State:\n");
+	drawGrid();
+	for(ix=0;ix<10;ix++){
+		test[0] = alphabet[ix];
+		for(jx=0;jx<4;jx++){
+			test[1] = direction[jx];
+			for(kx=1;kx<gridSize;kx++){
+				test[2] = kx + '0';
+				if(testMove(test,0)==1 && solution==-1){
+					curr = head;
+					if(curr==NULL){
+						head = malloc(sizeof(item));
+						strcpy(head->moves[0],test);
+						for(lx=1;lx<100;lx++){head->moves[lx][0] = 'X';}
+						head->g = 1; head->h = 1;
+						printf("%s is/are the move(s) performed here:\n",test);
+						testMove(test,1);
+						for(lx=(tempcoor[0][0]-'0')+(tempcoor[0][3]-'0');lx<gridSize;lx++){
+							if(tempgrid[(tempcoor[0][1]-'0')][lx]!='*'){
+								head->h++;
+							}
+						} // get h(x)
+						if(solution==1){printf("Solution found! \n");/*finish timer #code*/}
+						for(lx=0;lx<50;lx++){strcpy(head->state[lx],tempgrid[lx]);}
+						for(lx=0;lx<10;lx++){strcpy(head->coor[lx],tempcoor[lx]);}
+						head->next = NULL;
+					}
+					else{
+						while(curr->next!=NULL){curr = curr->next;}
+						curr->next = malloc(sizeof(item));
+						strcpy(curr->next->moves[0],test);
+						for(lx=1;lx<100;lx++){curr->next->moves[lx][0] = 'X';}
+						curr->next->g = 1; curr->next->h = 1;
+						printf("%s is/are the move(s) performed here:\n",test);
+						testMove(test,1);
+						for(lx=(tempcoor[0][0]-'0')+(tempcoor[0][3]-'0');lx<gridSize;lx++){
+							if(tempgrid[(tempcoor[0][1]-'0')][lx]!='*'){
+								curr->next->h++;
+							}
+						} // get h(x)
+						if(solution==1){printf("Solution found! \n");/*finish timer #code*/}
+						for(lx=0;lx<50;lx++){strcpy(curr->next->state[lx],tempgrid[lx]);}
+						for(lx=0;lx<10;lx++){strcpy(curr->next->coor[lx],tempcoor[lx]);}
+						curr->next->next = NULL;
+					}
+				}
+			}
+		}
+	}
+
+	while(solution==-1){
+		min = malloc(sizeof(item));
+		curr = head; minimum = 9999; min = NULL;
+		while(curr!=NULL){
+			if(minimum > curr->g + curr->h){minimum = curr->g + curr->h; min = curr;}
+			curr = curr->next;
+		}
+
+		// copy "node to expand" attributes to global variables
+		curr=min;
+		for(ix=0;ix<100;ix++){strcpy(global_moves[ix],curr->moves[ix]);}
+		for(ix=0;ix<50;ix++){strcpy(grid[ix],curr->state[ix]);}
+		for(ix=0;ix<10;ix++){strcpy(carCoor[ix],curr->coor[ix]);}
+		global_g = curr->g; global_h = curr->h;
+
+		// free curr
+		curr = head;
+		if(head==min){head=head->next;}
+		else{
+			while(curr->next!=min){curr=curr->next;}
+			curr->next = curr->next->next; curr = min;
+		}
+		free(min);
+		nodeCounter++;
+
+		for(ix=0;ix<10;ix++){
+			test[0] = alphabet[ix];
+			for(jx=0;jx<4;jx++){
+				test[1] = direction[jx];
+				for(kx=1;kx<gridSize;kx++){
+					test[2] = kx + '0';
+					if(testMove(test,0)==1 && solution==-1){
+						if(test[0]==global_moves[global_g-1][0]){continue;}
+						curr = head;
+						if(curr==NULL){
+							head = malloc(sizeof(item));
+							for(lx=0;global_moves[lx][0]!='X';lx++){strcpy(head->moves[lx],global_moves[lx]);printf("%s->",global_moves[lx]);}
+							for(lx=lx+1;lx<100;lx++){strcpy(head->moves[lx],"XXX\0");}
+							head->g = global_g+1; head->h = 1;
+							strcpy(head->moves[global_g],test);
+							printf("%s is/are the move(s) performed here:\n",test);
+							testMove(test,1);
+							for(lx=(tempcoor[0][0]-'0')+(tempcoor[0][3]-'0');lx<gridSize;lx++){
+								if(tempgrid[(tempcoor[0][1]-'0')][lx]!='*'){
+									head->h++;
+								}
+							} // get h(x)
+							for(lx=0;lx<50;lx++){strcpy(head->state[lx],tempgrid[lx]);}
+							for(lx=0;lx<10;lx++){strcpy(head->coor[lx],tempcoor[lx]);}
+							head->next = NULL;
+						}
+						else{
+							while(curr->next!=NULL){curr = curr->next;}
+							curr->next = malloc(sizeof(item));
+							for(lx=0;global_moves[lx][0]!='X';lx++){strcpy(curr->next->moves[lx],global_moves[lx]); printf("%s->",global_moves[lx]);}
+							for(lx=lx+1;lx<100;lx++){strcpy(curr->next->moves[lx],"XXX\0");}
+							curr->next->g = global_g+1; curr->next->h = 1;
+							strcpy(curr->next->moves[global_g],test);
+							printf("%s is/are the move(s) performed here:\n",test);
+							testMove(test,1);
+							for(lx=(tempcoor[0][0]-'0')+(tempcoor[0][3]-'0');lx<gridSize;lx++){
+								if(tempgrid[(tempcoor[0][1]-'0')][lx]!='*'){
+									curr->next->h++;
+								}
+							} // get h(x)
+							if(solution==1){printf("Solution found! \n");/*finish timer #code*/}
+							for(lx=0;lx<50;lx++){strcpy(curr->next->state[lx],tempgrid[lx]);}
+							for(lx=0;lx<10;lx++){strcpy(curr->next->coor[lx],tempcoor[lx]);}
+							curr->next->next = NULL;
+						}
+					}
+				}
+			}
+		}
+
+	}
+
+	printf(" Number of expanded nodes: %d\n", nodeCounter);
+	printf(" Time: ???\n" /*time???? #code*/);
+
 }
 
 int testMove(char input[4], int action){
