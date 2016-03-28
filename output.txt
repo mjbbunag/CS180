@@ -1,0 +1,8 @@
+5
+DU1
+FL3
+DD3
+ED2
+AR3
+Number of expanded nodes: 54
+Time: 4457.00 ms

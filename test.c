@@ -18,7 +18,7 @@ char grid[50][50];
 char tempgrid[50][50];
 char tempcoor[15][10];
 char alphabet[15] = "ABCDEFGHIJKLMNO";
-FILE*fptr;
+FILE*fptr, *fout;
 
 typedef struct item{
 	char moves[100][4];
@@ -34,6 +34,9 @@ item *print;
 int main(){
 	int ix, jx, kx, lx, minimum;
 	/*initialize time variables #code*/
+	clock_t start, end;
+	double runTime;
+	
 	nodeCounter = 1;
 	item *head = NULL;
 	item *curr;
@@ -53,6 +56,7 @@ int main(){
 	char test[4];
 	char direction[4] = "LDUR";
 	/*start timer #code*/
+	start=clock();
 	for(ix=0;ix<15;ix++){
 		test[0] = alphabet[ix];
 		for(jx=0;jx<4;jx++){
@@ -68,7 +72,7 @@ int main(){
 						head->g = 1; head->h = 0;
 						printf("%s is/are the move(s) performed here:\n",test);
 						testMove(test,1);
-						if(solution==1){printf("Solution found! \n");/*finish timer #code*/}
+						if(solution==1){printf("Solution found! \n");/*finish timer #code*/ end=clock();}
 						for(lx=0;lx<50;lx++){strcpy(head->state[lx],tempgrid[lx]);}
 						for(lx=0;lx<15;lx++){strcpy(head->coor[lx],tempcoor[lx]);}
 						head->next = NULL;
@@ -81,7 +85,7 @@ int main(){
 						curr->next->g = 1; curr->next->h = 0;
 						printf("%s is/are the move(s) performed here:\n",test);
 						testMove(test,1); // note: only use tempgrid after the use of testMove(test,1)
-						if(solution==1){printf("Solution found! \n");/*finish timer #code*/}
+						if(solution==1){printf("Solution found! \n");/*finish timer #code*/end=clock();}
 						for(lx=0;lx<50;lx++){strcpy(curr->next->state[lx],tempgrid[lx]);}
 						for(lx=0;lx<15;lx++){strcpy(curr->next->coor[lx],tempcoor[lx]);}
 						curr->next->next = NULL;
@@ -149,7 +153,7 @@ int main(){
 							strcpy(curr->next->moves[global_g],test);
 							printf("%s is/are the move(s) performed here:\n",test);
 							testMove(test,1);
-							if(solution==1){printf("Solution found! \n");/*finish timer #code*/}
+							if(solution==1){printf("Solution found! \n");/*finish timer #code*/end=clock();}
 							for(lx=0;lx<50;lx++){strcpy(curr->next->state[lx],tempgrid[lx]);}
 							for(lx=0;lx<15;lx++){strcpy(curr->next->coor[lx],tempcoor[lx]);}
 							curr->next->next = NULL;
@@ -161,12 +165,15 @@ int main(){
 
 
 	}
+	runTime=(double) (end-start)/CLOCKS_PER_SEC;
 	printf(" Number of expanded nodes: %d\n", nodeCounter);
-	printf(" Time: ???\n" /*time???? #code*/);
+	printf(" Time: %d ms\n", runTime /*time???? #code*/);
 	// reset counter, time, global variables, pointers.
 
 	nodeCounter = 0; solution=-1;
 	// reset timer #code
+	runTime=0;
+	start=clock();
 	while((head=curr)!=NULL){curr = curr->next; free(head);}
 	for(ix=0;ix<gridSize;ix++){strcpy(grid[ix],origGrid[ix]);}
 	for(ix=0;ix<15;ix++){strcpy(carCoor[ix],origCarCoor[ix]);}
@@ -192,7 +199,7 @@ int main(){
 								head->h++;
 							}
 						} // get h(x)
-						if(solution==1){printf("Solution found! \n");/*finish timer #code*/}
+						if(solution==1){printf("Solution found! \n");/*finish timer #code*/end=clock();}
 						for(lx=0;lx<50;lx++){strcpy(head->state[lx],tempgrid[lx]);}
 						for(lx=0;lx<15;lx++){strcpy(head->coor[lx],tempcoor[lx]);}
 						head->next = NULL;
@@ -210,7 +217,7 @@ int main(){
 								curr->next->h++;
 							}
 						} // get h(x)
-						if(solution==1){printf("Solution found! \n");/*finish timer #code*/}
+						if(solution==1){printf("Solution found! \n");/*finish timer #code*/end=clock();}
 						for(lx=0;lx<50;lx++){strcpy(curr->next->state[lx],tempgrid[lx]);}
 						for(lx=0;lx<15;lx++){strcpy(curr->next->coor[lx],tempcoor[lx]);}
 						curr->next->next = NULL;
@@ -285,7 +292,7 @@ int main(){
 									curr->next->h++;
 								}
 							} // get h(x)
-							if(solution==1){printf("Solution found! \n");/*finish timer #code*/}
+							if(solution==1){printf("Solution found! \n");/*finish timer #code*/end=clock();}
 							for(lx=0;lx<50;lx++){strcpy(curr->next->state[lx],tempgrid[lx]);}
 							for(lx=0;lx<15;lx++){strcpy(curr->next->coor[lx],tempcoor[lx]);}
 							curr->next->next = NULL;
@@ -296,10 +303,24 @@ int main(){
 		}
 
 	}
-
-	printf(" Number of expanded nodes: %d\n", nodeCounter);
-	printf(" Time: ???\n" /*time???? #code*/);
-
+	fout=fopen("output.txt", "w");
+	
+	lx=0;
+	while(curr->next->moves[lx][0]!='X'){
+		lx++;
+	}
+	fprintf(fout,"%d\n",lx);
+	printf("No. of moves: %d\n",lx);
+	for(ix=0;ix<lx;ix++){
+		fprintf(fout,"%s\n",curr->next->moves[ix]);
+		printf("Step %d: %s\n",ix+1,curr->next->moves[ix]);
+	}
+	runTime= 1000*((double) (end-start)/CLOCKS_PER_SEC);
+	fprintf(fout,"Number of expanded nodes: %d\n", nodeCounter);
+	printf("Number of expanded nodes: %d\n", nodeCounter);
+	fprintf(fout,"Time: %.2lf ms\n",runTime/*time???? #code*/);
+	printf("Time: %.2lf ms\n",runTime /*time???? #code*/);
+	fclose(fout);
 }
 
 int testMove(char input[4], int action){
