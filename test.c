@@ -11,19 +11,19 @@ int testMove();
 
 int gridSize, carCount, global_g, global_h, solution, nodeCounter;
 char global_moves[100][4];
-char origCarCoor[10][10];
-char carCoor[10][10];
+char origCarCoor[15][10];
+char carCoor[15][10];
 char origGrid[50][50];
 char grid[50][50];
 char tempgrid[50][50];
-char tempcoor[10][10];
-char alphabet[10] = "ABCDEFGHIJ";
+char tempcoor[15][10];
+char alphabet[15] = "ABCDEFGHIJKLMNO";
 FILE*fptr;
 
 typedef struct item{
 	char moves[100][4];
 	char state[50][50];
-	char coor[10][10];
+	char coor[15][10];
 	int g;
 	int h;
 	struct item * next;
@@ -45,7 +45,7 @@ int main(){
 		intGrid();
 		createGrid();
 		for(ix=0;ix<gridSize;ix++){strcpy(origGrid[ix],grid[ix]);}
-		for(ix=0;ix<10;ix++){strcpy(origCarCoor[ix],carCoor[ix]);}
+		for(ix=0;ix<15;ix++){strcpy(origCarCoor[ix],carCoor[ix]);}
 		printf("Performing BFS...\nOriginal state:\n");
 		drawGrid();
 	}
@@ -53,7 +53,7 @@ int main(){
 	char test[4];
 	char direction[4] = "LDUR";
 	/*start timer #code*/
-	for(ix=0;ix<10;ix++){
+	for(ix=0;ix<15;ix++){
 		test[0] = alphabet[ix];
 		for(jx=0;jx<4;jx++){
 			test[1] = direction[jx];
@@ -70,7 +70,7 @@ int main(){
 						testMove(test,1);
 						if(solution==1){printf("Solution found! \n");/*finish timer #code*/}
 						for(lx=0;lx<50;lx++){strcpy(head->state[lx],tempgrid[lx]);}
-						for(lx=0;lx<10;lx++){strcpy(head->coor[lx],tempcoor[lx]);}
+						for(lx=0;lx<15;lx++){strcpy(head->coor[lx],tempcoor[lx]);}
 						head->next = NULL;
 					}
 					else{
@@ -83,7 +83,7 @@ int main(){
 						testMove(test,1); // note: only use tempgrid after the use of testMove(test,1)
 						if(solution==1){printf("Solution found! \n");/*finish timer #code*/}
 						for(lx=0;lx<50;lx++){strcpy(curr->next->state[lx],tempgrid[lx]);}
-						for(lx=0;lx<10;lx++){strcpy(curr->next->coor[lx],tempcoor[lx]);}
+						for(lx=0;lx<15;lx++){strcpy(curr->next->coor[lx],tempcoor[lx]);}
 						curr->next->next = NULL;
 					}
 				}
@@ -111,7 +111,7 @@ int main(){
 		// copy "node to expand" attributes to global variables
 		for(ix=0;ix<100;ix++){strcpy(global_moves[ix],curr->moves[ix]);}
 		for(ix=0;ix<50;ix++){strcpy(grid[ix],curr->state[ix]);}
-		for(ix=0;ix<10;ix++){strcpy(carCoor[ix],curr->coor[ix]);}
+		for(ix=0;ix<15;ix++){strcpy(carCoor[ix],curr->coor[ix]);}
 		global_g = curr->g; global_h = curr->h;
 
 		// free curr
@@ -119,7 +119,7 @@ int main(){
 		curr = malloc(sizeof(item));
 		nodeCounter++;
 
-		for(ix=0;ix<10;ix++){
+		for(ix=0;ix<15;ix++){
 			test[0] = alphabet[ix];
 			for(jx=0;jx<4;jx++){
 				test[1] = direction[jx];
@@ -137,7 +137,7 @@ int main(){
 							printf("%s is/are the move(s) performed here:\n",test);
 							testMove(test,1);
 							for(lx=0;lx<50;lx++){strcpy(head->state[lx],tempgrid[lx]);}
-							for(lx=0;lx<10;lx++){strcpy(head->coor[lx],tempcoor[lx]);}
+							for(lx=0;lx<15;lx++){strcpy(head->coor[lx],tempcoor[lx]);}
 							head->next = NULL;
 						}
 						else{
@@ -151,7 +151,7 @@ int main(){
 							testMove(test,1);
 							if(solution==1){printf("Solution found! \n");/*finish timer #code*/}
 							for(lx=0;lx<50;lx++){strcpy(curr->next->state[lx],tempgrid[lx]);}
-							for(lx=0;lx<10;lx++){strcpy(curr->next->coor[lx],tempcoor[lx]);}
+							for(lx=0;lx<15;lx++){strcpy(curr->next->coor[lx],tempcoor[lx]);}
 							curr->next->next = NULL;
 						}
 					}
@@ -169,10 +169,10 @@ int main(){
 	// reset timer #code
 	while((head=curr)!=NULL){curr = curr->next; free(head);}
 	for(ix=0;ix<gridSize;ix++){strcpy(grid[ix],origGrid[ix]);}
-	for(ix=0;ix<10;ix++){strcpy(carCoor[ix],origCarCoor[ix]);}
+	for(ix=0;ix<15;ix++){strcpy(carCoor[ix],origCarCoor[ix]);}
 	printf("\nPerforming blocking heuristic...\nOriginal State:\n");
 	drawGrid();
-	for(ix=0;ix<10;ix++){
+	for(ix=0;ix<15;ix++){
 		test[0] = alphabet[ix];
 		for(jx=0;jx<4;jx++){
 			test[1] = direction[jx];
@@ -194,7 +194,7 @@ int main(){
 						} // get h(x)
 						if(solution==1){printf("Solution found! \n");/*finish timer #code*/}
 						for(lx=0;lx<50;lx++){strcpy(head->state[lx],tempgrid[lx]);}
-						for(lx=0;lx<10;lx++){strcpy(head->coor[lx],tempcoor[lx]);}
+						for(lx=0;lx<15;lx++){strcpy(head->coor[lx],tempcoor[lx]);}
 						head->next = NULL;
 					}
 					else{
@@ -212,7 +212,7 @@ int main(){
 						} // get h(x)
 						if(solution==1){printf("Solution found! \n");/*finish timer #code*/}
 						for(lx=0;lx<50;lx++){strcpy(curr->next->state[lx],tempgrid[lx]);}
-						for(lx=0;lx<10;lx++){strcpy(curr->next->coor[lx],tempcoor[lx]);}
+						for(lx=0;lx<15;lx++){strcpy(curr->next->coor[lx],tempcoor[lx]);}
 						curr->next->next = NULL;
 					}
 				}
@@ -232,7 +232,7 @@ int main(){
 		curr=min;
 		for(ix=0;ix<100;ix++){strcpy(global_moves[ix],curr->moves[ix]);}
 		for(ix=0;ix<50;ix++){strcpy(grid[ix],curr->state[ix]);}
-		for(ix=0;ix<10;ix++){strcpy(carCoor[ix],curr->coor[ix]);}
+		for(ix=0;ix<15;ix++){strcpy(carCoor[ix],curr->coor[ix]);}
 		global_g = curr->g; global_h = curr->h;
 
 		// free curr
@@ -245,7 +245,7 @@ int main(){
 		free(min);
 		nodeCounter++;
 
-		for(ix=0;ix<10;ix++){
+		for(ix=0;ix<15;ix++){
 			test[0] = alphabet[ix];
 			for(jx=0;jx<4;jx++){
 				test[1] = direction[jx];
@@ -268,7 +268,7 @@ int main(){
 								}
 							} // get h(x)
 							for(lx=0;lx<50;lx++){strcpy(head->state[lx],tempgrid[lx]);}
-							for(lx=0;lx<10;lx++){strcpy(head->coor[lx],tempcoor[lx]);}
+							for(lx=0;lx<15;lx++){strcpy(head->coor[lx],tempcoor[lx]);}
 							head->next = NULL;
 						}
 						else{
@@ -287,7 +287,7 @@ int main(){
 							} // get h(x)
 							if(solution==1){printf("Solution found! \n");/*finish timer #code*/}
 							for(lx=0;lx<50;lx++){strcpy(curr->next->state[lx],tempgrid[lx]);}
-							for(lx=0;lx<10;lx++){strcpy(curr->next->coor[lx],tempcoor[lx]);}
+							for(lx=0;lx<15;lx++){strcpy(curr->next->coor[lx],tempcoor[lx]);}
 							curr->next->next = NULL;
 						}
 					}
@@ -322,7 +322,7 @@ int testMove(char input[4], int action){
 				carCoor[carNum][0] = (x - step) + '0';
 				createGrid();
 				for(ix=0;ix<50;ix++){strcpy(tempgrid[ix],grid[ix]);}
-				for(ix=0;ix<10;ix++){strcpy(tempcoor[ix],carCoor[ix]);}
+				for(ix=0;ix<15;ix++){strcpy(tempcoor[ix],carCoor[ix]);}
 				drawGrid();
 				carCoor[carNum][0] = x + '0';
 				createGrid();
@@ -338,7 +338,7 @@ int testMove(char input[4], int action){
 				carCoor[carNum][0] = (x + step) + '0';
 				createGrid();
 				for(ix=0;ix<50;ix++){strcpy(tempgrid[ix],grid[ix]);}
-				for(ix=0;ix<10;ix++){strcpy(tempcoor[ix],carCoor[ix]);}
+				for(ix=0;ix<15;ix++){strcpy(tempcoor[ix],carCoor[ix]);}
 				drawGrid();
 				solution = (carCoor[0][0]==gridSize-(carCoor[0][3]-'0')+'0')? 1:-1;
 				carCoor[carNum][0] = x + '0';
@@ -355,7 +355,7 @@ int testMove(char input[4], int action){
 				carCoor[carNum][1] = (y - step) + '0';
 				createGrid();
 				for(ix=0;ix<50;ix++){strcpy(tempgrid[ix],grid[ix]);}
-				for(ix=0;ix<10;ix++){strcpy(tempcoor[ix],carCoor[ix]);}
+				for(ix=0;ix<15;ix++){strcpy(tempcoor[ix],carCoor[ix]);}
 				drawGrid();
 				// check if solution #code
 				carCoor[carNum][1] = y + '0';
@@ -372,7 +372,7 @@ int testMove(char input[4], int action){
 				carCoor[carNum][1] = (y + step) + '0';
 				createGrid();
 				for(ix=0;ix<50;ix++){strcpy(tempgrid[ix],grid[ix]);}
-				for(ix=0;ix<10;ix++){strcpy(tempcoor[ix],carCoor[ix]);}
+				for(ix=0;ix<15;ix++){strcpy(tempcoor[ix],carCoor[ix]);}
 				drawGrid();
 				// check if solution #code
 				carCoor[carNum][1] = y + '0';
