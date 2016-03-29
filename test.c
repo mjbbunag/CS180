@@ -449,6 +449,11 @@ int intGrid(){
 			j++;
 		}
 	}
+	
+	if(carCoor[0][1]-'0'!= (gridSize/2)-1){
+		printf("ERROR: Car A not in line with exit.\n");
+		exit(0);
+	}
 	carCount = i;
 	// printf("%d\n",carCount); //tester
 	for(i=0;i<carCount;i++){
