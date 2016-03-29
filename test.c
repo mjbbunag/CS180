@@ -162,12 +162,28 @@ int main(){
 				}
 			}
 		}
-
-
 	}
-	runTime=(double) (end-start)/CLOCKS_PER_SEC;
-	printf(" Number of expanded nodes: %d\n", nodeCounter);
-	printf(" Time: %d ms\n", runTime /*time???? #code*/);
+	fout=fopen("output.txt", "w");
+	fprintf(fout,"Zero Heuristic:\n");
+	lx=0;
+	while(curr->next->moves[lx][0]!='X'){
+		lx++;
+	}
+	fprintf(fout,"%d\n",lx);
+	printf("No. of moves: %d\n",lx);
+	for(ix=0;ix<lx;ix++){
+		fprintf(fout,"%s\n",curr->next->moves[ix]);
+		printf("Step %d: %s\n",ix+1,curr->next->moves[ix]);
+	}
+	
+	runTime= 1000*((double) (end-start)/CLOCKS_PER_SEC);
+	fprintf(fout,"Number of expanded nodes: %d\n", nodeCounter);
+	printf("Number of expanded nodes: %d\n", nodeCounter);
+	fprintf(fout,"Time: %.2lf ms\n",runTime/*time???? #code*/);
+	printf("Time: %.2lf ms\n",runTime /*time???? #code*/);
+	fprintf(fout,"Depth of search tree: %d\n\n",lx);
+	printf("Depth of search tree: %d",lx);
+	//fclose(fout);
 	// reset counter, time, global variables, pointers.
 
 	nodeCounter = 0; solution=-1;
@@ -303,8 +319,9 @@ int main(){
 		}
 
 	}
-	fout=fopen("output.txt", "w");
+	//fout=fopen("output.txt", "w");
 	
+	fprintf(fout,"Blocking Heuristic:\n");
 	lx=0;
 	while(curr->next->moves[lx][0]!='X'){
 		lx++;
@@ -315,11 +332,14 @@ int main(){
 		fprintf(fout,"%s\n",curr->next->moves[ix]);
 		printf("Step %d: %s\n",ix+1,curr->next->moves[ix]);
 	}
+	
 	runTime= 1000*((double) (end-start)/CLOCKS_PER_SEC);
 	fprintf(fout,"Number of expanded nodes: %d\n", nodeCounter);
 	printf("Number of expanded nodes: %d\n", nodeCounter);
 	fprintf(fout,"Time: %.2lf ms\n",runTime/*time???? #code*/);
 	printf("Time: %.2lf ms\n",runTime /*time???? #code*/);
+	fprintf(fout,"Depth of search tree: %d",lx);
+	printf("Depth of search tree: %d",lx);
 	fclose(fout);
 }
 
