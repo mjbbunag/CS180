@@ -1,23 +1,44 @@
 Zero Heuristic:
-2
-CU1
-AR4
-Number of expanded nodes: 8
-Time: 3.63 ms
-Depth of search tree: 2
+9
+DD3
+AL1
+BU3
+AR1
+DU3
+CL3
+GL2
+FD3
+AR3
+Number of expanded nodes: 11218
+Time: 1524635.00 ms
+Depth of search tree: 9
 
 Blocking Heuristic:
-2
-CU1
-AR4
-Number of expanded nodes: 1
-Time: 0.72 ms
-Depth of search tree: 2
+9
+DD3
+AL1
+BU3
+AR1
+DU3
+CL3
+GL2
+FD3
+AR3
+Number of expanded nodes: 3033
+Time: 300294.00 ms
+Depth of search tree: 9
 
 Advanced Heuristic:
-2
-CU1
-AR4
-Number of expanded nodes: 1
-Time: 0.77 ms
-Depth of search tree: 2
+9
+DD3
+AL1
+BU3
+AR1
+DU3
+CL3
+GL2
+FD3
+AR3
+Number of expanded nodes: 3032
+Time: 290222.00 ms
+Depth of search tree: 9
