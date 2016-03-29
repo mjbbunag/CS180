@@ -3,6 +3,9 @@
 #include <string.h>
 #include <time.h>
 
+#define max(x,y) ( (x) > (y) ? x : y )
+#define min(x,y) ( (x) < (y) ? x : y )
+
 int carCoordinates();
 int createGrid();
 int drawGrid();
@@ -36,7 +39,7 @@ int main(){
 	/*initialize time variables #code*/
 	clock_t start, end;
 	double runTime;
-	
+
 	nodeCounter = 1;
 	item *head = NULL;
 	item *curr;
@@ -175,7 +178,7 @@ int main(){
 		fprintf(fout,"%s\n",curr->next->moves[ix]);
 		printf("Step %d: %s\n",ix+1,curr->next->moves[ix]);
 	}
-	
+
 	runTime= 1000*((double) (end-start)/CLOCKS_PER_SEC);
 	fprintf(fout,"Number of expanded nodes: %d\n", nodeCounter);
 	printf("Number of expanded nodes: %d\n", nodeCounter);
@@ -320,7 +323,7 @@ int main(){
 
 	}
 	//fout=fopen("output.txt", "w");
-	
+
 	fprintf(fout,"Blocking Heuristic:\n");
 	lx=0;
 	while(curr->next->moves[lx][0]!='X'){
@@ -332,15 +335,178 @@ int main(){
 		fprintf(fout,"%s\n",curr->next->moves[ix]);
 		printf("Step %d: %s\n",ix+1,curr->next->moves[ix]);
 	}
-	
+
 	runTime= 1000*((double) (end-start)/CLOCKS_PER_SEC);
 	fprintf(fout,"Number of expanded nodes: %d\n", nodeCounter);
 	printf("Number of expanded nodes: %d\n", nodeCounter);
 	fprintf(fout,"Time: %.2lf ms\n",runTime/*time???? #code*/);
 	printf("Time: %.2lf ms\n",runTime /*time???? #code*/);
-	fprintf(fout,"Depth of search tree: %d",lx);
-	printf("Depth of search tree: %d",lx);
-	fclose(fout);
+	fprintf(fout,"Depth of search tree: %d\n\n",lx);
+	printf("Depth of search tree: %d\n",lx);
+
+//SCRATCHHH
+
+nodeCounter = 0; solution=-1;
+runTime=0;
+start=clock();
+while((head=curr)!=NULL){curr = curr->next; free(head);}
+for(ix=0;ix<gridSize;ix++){strcpy(grid[ix],origGrid[ix]);}
+for(ix=0;ix<15;ix++){strcpy(carCoor[ix],origCarCoor[ix]);}
+printf("\nPerforming advanced heuristic...\nOriginal State:\n");
+drawGrid();
+for(ix=0;ix<15;ix++){
+	test[0] = alphabet[ix];
+	for(jx=0;jx<4;jx++){
+		test[1] = direction[jx];
+		for(kx=1;kx<gridSize;kx++){
+			test[2] = kx + '0';
+			if(testMove(test,0)==1 && solution==-1){
+				curr = head;
+				if(curr==NULL){
+					head = malloc(sizeof(item));
+					strcpy(head->moves[0],test);
+					for(lx=1;lx<100;lx++){head->moves[lx][0] = 'X';}
+					head->g = 1; head->h = 1;
+					printf("%s is/are the move(s) performed here:\n",test);
+					testMove(test,1);
+					for(lx=1;lx<carCount;lx++){
+						if(tempcoor[lx][2]=='v' && tempcoor[lx][0]-'0'>tempcoor[0][0]-'0'){
+							head->h = head->h + max(0,min((tempcoor[0][1]-'0')-(tempcoor[lx][1]-'0')+1,(tempcoor[lx][1]-'0')+(tempcoor[lx][3]-'0')-(tempcoor[0][1]-'0')));
+						}
+					} // get h(x)
+					printf("h=%d\n",head->h);
+					if(solution==1){printf("Solution found! \n");/*finish timer #code*/end=clock();}
+					for(lx=0;lx<50;lx++){strcpy(head->state[lx],tempgrid[lx]);}
+					for(lx=0;lx<15;lx++){strcpy(head->coor[lx],tempcoor[lx]);}
+					head->next = NULL;
+				}
+				else{
+					while(curr->next!=NULL){curr = curr->next;}
+					curr->next = malloc(sizeof(item));
+					strcpy(curr->next->moves[0],test);
+					for(lx=1;lx<100;lx++){curr->next->moves[lx][0] = 'X';}
+					curr->next->g = 1; curr->next->h = 1;
+					printf("%s is/are the move(s) performed here:\n",test);
+					testMove(test,1);
+					for(lx=1;lx<carCount;lx++){
+						if(tempcoor[lx][2]=='v' && tempcoor[lx][0]-'0'>tempcoor[0][0]-'0'){
+							curr->next->h = curr->next->h + max(0,min((tempcoor[0][1]-'0')-(tempcoor[lx][1]-'0')+1,(tempcoor[lx][1]-'0')+(tempcoor[lx][3]-'0')-(tempcoor[0][1]-'0')));
+						}
+					} // get h(x)
+					printf("h=%d\n",curr->next->h);
+					if(solution==1){printf("Solution found! \n");/*finish timer #code*/end=clock();}
+					for(lx=0;lx<50;lx++){strcpy(curr->next->state[lx],tempgrid[lx]);}
+					for(lx=0;lx<15;lx++){strcpy(curr->next->coor[lx],tempcoor[lx]);}
+					curr->next->next = NULL;
+				}
+			}
+		}
+	}
+}
+
+while(solution==-1){
+	min = malloc(sizeof(item));
+	curr = head; minimum = 9999; min = NULL;
+	while(curr!=NULL){
+		if(minimum > curr->g + curr->h){minimum = curr->g + curr->h; min = curr;}
+		curr = curr->next;
+	}
+
+	// copy "node to expand" attributes to global variables
+	curr=min;
+	for(ix=0;ix<100;ix++){strcpy(global_moves[ix],curr->moves[ix]);}
+	for(ix=0;ix<50;ix++){strcpy(grid[ix],curr->state[ix]);}
+	for(ix=0;ix<15;ix++){strcpy(carCoor[ix],curr->coor[ix]);}
+	global_g = curr->g; global_h = curr->h;
+
+	// free curr
+	curr = head;
+	if(head==min){head=head->next;}
+	else{
+		while(curr->next!=min){curr=curr->next;}
+		curr->next = curr->next->next; curr = min;
+	}
+	free(min);
+	nodeCounter++;
+
+	for(ix=0;ix<15;ix++){
+		test[0] = alphabet[ix];
+		for(jx=0;jx<4;jx++){
+			test[1] = direction[jx];
+			for(kx=1;kx<gridSize;kx++){
+				test[2] = kx + '0';
+				if(testMove(test,0)==1 && solution==-1){
+					if(test[0]==global_moves[global_g-1][0]){continue;}
+					curr = head;
+					if(curr==NULL){
+						head = malloc(sizeof(item));
+						for(lx=0;global_moves[lx][0]!='X';lx++){strcpy(head->moves[lx],global_moves[lx]);printf("%s->",global_moves[lx]);}
+						for(lx=lx+1;lx<100;lx++){strcpy(head->moves[lx],"XXX\0");}
+						head->g = global_g+1; head->h = 1;
+						strcpy(head->moves[global_g],test);
+						printf("%s is/are the move(s) performed here:\n",test);
+						testMove(test,1);
+						for(lx=1;lx<carCount;lx++){
+							if(tempcoor[lx][2]=='v' && tempcoor[lx][0]-'0'>tempcoor[0][0]-'0'){
+								head->h = head->h + max(0,min((tempcoor[0][1]-'0')-(tempcoor[lx][1]-'0')+1,(tempcoor[lx][1]-'0')+(tempcoor[lx][3]-'0')-(tempcoor[0][1]-'0')));
+							}
+						} // get h(x)
+						printf("h=%d\n",head->h);
+						for(lx=0;lx<50;lx++){strcpy(head->state[lx],tempgrid[lx]);}
+						for(lx=0;lx<15;lx++){strcpy(head->coor[lx],tempcoor[lx]);}
+						head->next = NULL;
+					}
+					else{
+						while(curr->next!=NULL){curr = curr->next;}
+						curr->next = malloc(sizeof(item));
+						for(lx=0;global_moves[lx][0]!='X';lx++){strcpy(curr->next->moves[lx],global_moves[lx]); printf("%s->",global_moves[lx]);}
+						for(lx=lx+1;lx<100;lx++){strcpy(curr->next->moves[lx],"XXX\0");}
+						curr->next->g = global_g+1; curr->next->h = 1;
+						strcpy(curr->next->moves[global_g],test);
+						printf("%s is/are the move(s) performed here:\n",test);
+						testMove(test,1);
+						for(lx=1;lx<carCount;lx++){
+							if(tempcoor[lx][2]=='v' && tempcoor[lx][0]-'0'>tempcoor[0][0]-'0'){
+								curr->next->h = curr->next->h + max(0,min((tempcoor[0][1]-'0')-(tempcoor[lx][1]-'0')+1,(tempcoor[lx][1]-'0')+(tempcoor[lx][3]-'0')-(tempcoor[0][1]-'0')));
+							}
+						} // get h(x)
+						printf("h=%d\n",curr->next->h);
+						if(solution==1){printf("Solution found! \n");/*finish timer #code*/end=clock();}
+						for(lx=0;lx<50;lx++){strcpy(curr->next->state[lx],tempgrid[lx]);}
+						for(lx=0;lx<15;lx++){strcpy(curr->next->coor[lx],tempcoor[lx]);}
+						curr->next->next = NULL;
+					}
+				}
+			}
+		}
+	}
+
+}
+//fout=fopen("output.txt", "w");
+
+fprintf(fout,"Advanced Heuristic:\n");
+lx=0;
+while(curr->next->moves[lx][0]!='X'){
+	lx++;
+}
+fprintf(fout,"%d\n",lx);
+printf("No. of moves: %d\n",lx);
+for(ix=0;ix<lx;ix++){
+	fprintf(fout,"%s\n",curr->next->moves[ix]);
+	printf("Step %d: %s\n",ix+1,curr->next->moves[ix]);
+}
+
+runTime= 1000*((double) (end-start)/CLOCKS_PER_SEC);
+fprintf(fout,"Number of expanded nodes: %d\n", nodeCounter);
+printf("Number of expanded nodes: %d\n", nodeCounter);
+fprintf(fout,"Time: %.2lf ms\n",runTime/*time???? #code*/);
+printf("Time: %.2lf ms\n",runTime /*time???? #code*/);
+fprintf(fout,"Depth of search tree: %d",lx);
+printf("Depth of search tree: %d\n",lx);
+fclose(fout);
+
+//SCRATCHHH
+
 }
 
 int testMove(char input[4], int action){
@@ -449,7 +615,7 @@ int intGrid(){
 			j++;
 		}
 	}
-	
+
 	if(carCoor[0][1]-'0'!= (gridSize/2)-1){
 		printf("ERROR: Car A not in line with exit.\n");
 		exit(0);
